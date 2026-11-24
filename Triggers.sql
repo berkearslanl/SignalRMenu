@@ -1,62 +1,77 @@
-﻿create trigger IncreaseMoneyCases
-on Orders
-after Update
+/* =====================================================================
+   SignalRMenu - Veritabanı Trigger'ları
+   Not: Sipariş toplamı KDV dahil (%20) hesaplanır ve kasaya sipariş
+   anında eklenir. Bu yüzden eski "Hesap Ödendi" ile kasaya ekleyen
+   SumMoneyCases trigger'ı kaldırılmıştır.
+   ===================================================================== */
 
-create trigger IncreaseOrderTotalPrice
-on orderdetails
-after Insert
-as
-declare @OrderId int 
-declare @OrderPrice decimal(18,2)
-Select @OrderId=OrderId from inserted 
-select @OrderPrice = TotalPrice from inserted
-update Orders set TotalPrice+=@OrderPrice where OrderID=@OrderId
+-- Eski kasa trigger'ı (kasa artık OrderDetails trigger'ında güncelleniyor)
+DROP TRIGGER IF EXISTS SumMoneyCases;
+GO
 
+-- Sipariş eklenince masayı "Dolu" yapar
+CREATE OR ALTER TRIGGER SetTableFull
+ON Orders
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE t
+    SET t.Status = 1
+    FROM RestaurantTables t
+    JOIN inserted i ON i.RestaurantTableId = t.RestaurantTableId;
+END
+GO
 
+-- Hesap ödendi olarak işaretlenince masayı "Boş" yapar
+CREATE OR ALTER TRIGGER SetTableEmpty
+ON Orders
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE t
+    SET t.Status = 0
+    FROM RestaurantTables t
+    JOIN inserted i ON i.RestaurantTableId = t.RestaurantTableId
+    WHERE i.Description = N'Hesap Ödendi';
+END
+GO
 
-create trigger DecreaseOrderTotalPrice
-on orderdetails
-after delete
-as
-declare @OrderId int 
-declare @OrderPrice decimal(18,2)
-Select @OrderId=OrderId from deleted 
-select @OrderPrice = TotalPrice from deleted
-update Orders set TotalPrice-=@OrderPrice where OrderID=@OrderId
+-- Sipariş detayı eklenince: siparişin toplamına ve kasaya KDV dahil tutar ekler
+CREATE OR ALTER TRIGGER IncreaseOrderTotalPrice
+ON OrderDetails
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
 
+    UPDATE o
+    SET o.TotalPrice += x.Toplam * 1.20
+    FROM Orders o
+    JOIN (SELECT OrderId, SUM(TotalPrice) AS Toplam FROM inserted GROUP BY OrderId) x
+      ON x.OrderId = o.OrderID;
 
+    UPDATE MoneyCases
+    SET TotalAmount += (SELECT SUM(TotalPrice) FROM inserted) * 1.20;
+END
+GO
 
-create trigger SumMoneyCases
-on Orders
-after update
-as
-declare @Description nvarchar(max)
-declare @TotalPrice decimal(18,2)
-select @Description = Description from inserted
-select @TotalPrice = TotalPrice from inserted
-if(@Description=N'Hesap Kapatıldı')
-Begin
-Update MoneyCases set TotalAmount+=@TotalPrice 
-End
+-- Sipariş detayı silinince: siparişin toplamından ve kasadan KDV dahil tutarı düşer
+CREATE OR ALTER TRIGGER DecreaseOrderTotalPrice
+ON OrderDetails
+AFTER DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
 
+    UPDATE o
+    SET o.TotalPrice -= x.Toplam * 1.20
+    FROM Orders o
+    JOIN (SELECT OrderId, SUM(TotalPrice) AS Toplam FROM deleted GROUP BY OrderId) x
+      ON x.OrderId = o.OrderID;
 
-create trigger SetTableFull
-on Orders
-after insert
-as
-declare @TableId int
-select @TableId=RestaurantTableId from inserted
-update RestaurantTables set status = 1 where RestaurantTableId=@TableId
-
-create trigger SetTableEmpty
-on Orders
-after update
-as
-declare @Description nvarchar(max)
-declare @TableId int
-select @Description = Description from inserted
-select @TableId = RestaurantTableId from inserted
-if(@Description = N'Hesap Ödendi')
-begin
-update RestaurantTable set Status = 0 where RestaurantTableId=@TableId
-end
+    UPDATE MoneyCases
+    SET TotalAmount -= (SELECT SUM(TotalPrice) FROM deleted) * 1.20;
+END
+GO
