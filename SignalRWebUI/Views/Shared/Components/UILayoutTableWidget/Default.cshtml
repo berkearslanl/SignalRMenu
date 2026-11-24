@@ -1,0 +1,142 @@
+﻿@{
+    var tableId = Context.Request.Cookies["TableId"];
+    bool hasTable = !string.IsNullOrEmpty(tableId);
+}
+<style>
+    .tw-widget { position: fixed; right: 24px; bottom: 24px; z-index: 1050; font-family: 'Open Sans', 'Segoe UI', Roboto, Arial, sans-serif; }
+
+    /* Baloncuk */
+    .tw-bubble {
+        position: relative;
+        width: 62px; height: 62px;
+        border: 0; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; outline: none;
+        background: #ffbe33; color: #222831;
+        box-shadow: 0 10px 26px rgba(0,0,0,.28);
+        transition: transform .2s ease, background .2s ease;
+    }
+    .tw-bubble:hover { transform: scale(1.08); }
+    .tw-bubble svg { width: 30px; height: 30px; }
+    .tw-widget.is-open .tw-bubble { background: #222831; color: #ffbe33; }
+    .tw-widget.no-table .tw-bubble { background: #222831; color: #ffbe33; }
+
+    /* Nabız efekti */
+    .tw-bubble::before {
+        content: ""; position: absolute; inset: 0; border-radius: 50%;
+        background: inherit; z-index: -1;
+        animation: tw-pulse 2.2s ease-out infinite;
+    }
+    .tw-widget.is-open .tw-bubble::before { animation: none; }
+    @@keyframes tw-pulse {
+        0%   { transform: scale(1);   opacity: .55; }
+        100% { transform: scale(1.7); opacity: 0; }
+    }
+
+    /* Durum noktası */
+    .tw-dot {
+        position: absolute; top: 2px; right: 2px;
+        width: 15px; height: 15px; border-radius: 50%;
+        border: 3px solid #fff;
+        background: #10b981;
+    }
+    .tw-widget.no-table .tw-dot { background: #ef4444; }
+
+    /* Açılan panel */
+    .tw-panel {
+        position: absolute; right: 0; bottom: 78px;
+        width: 290px; max-width: calc(100vw - 48px);
+        background: #fff; border-radius: 18px; overflow: hidden;
+        box-shadow: 0 18px 44px rgba(0,0,0,.28);
+        opacity: 0; visibility: hidden; transform: translateY(14px) scale(.97);
+        transform-origin: bottom right;
+        transition: all .22s ease;
+    }
+    .tw-widget.is-open .tw-panel { opacity: 1; visibility: visible; transform: none; }
+
+    .tw-head { background: #222831; color: #fff; padding: 18px 20px; }
+    .tw-head small { display: block; color: #ffbe33; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; font-size: 11px; margin-bottom: 4px; }
+    .tw-head strong { font-size: 22px; }
+    .tw-body { padding: 18px 20px 20px; color: #4b5563; font-size: 14px; line-height: 1.55; }
+    .tw-body p { margin: 0 0 16px; }
+
+    .tw-btn {
+        display: block; width: 100%;
+        padding: 11px 14px; margin-top: 10px;
+        border: 0; border-radius: 40px;
+        font-weight: 700; font-size: 14px; text-align: center; text-decoration: none;
+        cursor: pointer; font-family: inherit; transition: all .2s ease;
+    }
+    .tw-btn:first-of-type { margin-top: 0; }
+    .tw-btn-primary { background: #ffbe33; color: #222831; }
+    .tw-btn-primary:hover { background: #222831; color: #ffbe33; text-decoration: none; }
+    .tw-btn-danger { background: #fdecec; color: #c53030; }
+    .tw-btn-danger:hover { background: #ef4444; color: #fff; }
+    .tw-btn-light { background: #f1f2f3; color: #222831; }
+    .tw-btn-light:hover { background: #e3e5e8; color: #222831; text-decoration: none; }
+    .tw-form { margin: 0; }
+
+    @@media (max-width: 576px) { .tw-widget { right: 16px; bottom: 16px; } }
+</style>
+
+<div class="tw-widget @(hasTable ? "has-table" : "no-table")" id="twWidget">
+    <div class="tw-panel" id="twPanel" role="dialog" aria-label="Masa bilgisi">
+        @if (hasTable)
+        {
+            <div class="tw-head">
+                <small>Masanız</small>
+                <strong>Masa @tableId</strong>
+            </div>
+            <div class="tw-body">
+                <p>Verdiğiniz siparişler bu masaya işlenir. Kalkarken aşağıdaki butonu kullanın.</p>
+                <a href="/MainMenu/Index" class="tw-btn tw-btn-primary">Menüye Git</a>
+                <form class="tw-form" asp-controller="CustomerTable" asp-action="Leave" method="post"
+                      onsubmit="return confirm('Masadan kalkmak istiyor musunuz?');">
+                    <button type="submit" class="tw-btn tw-btn-danger">Masadan Kalk</button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div class="tw-head">
+                <small>Hoş geldiniz</small>
+                <strong>Henüz masa seçmediniz</strong>
+            </div>
+            <div class="tw-body">
+                <p>Sipariş verebilmek için önce oturduğunuz masayı seçin.</p>
+                <a href="/CustomerTable/CustomerTableList" class="tw-btn tw-btn-primary">Masa Seç</a>
+            </div>
+        }
+    </div>
+
+    <button type="button" class="tw-bubble" id="twBubble" aria-label="Masa bilgisi" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10" />
+            <path d="M17 3c-2 1.5-3 4-3 7 0 1.5 1 2 3 2V3zM17 12v9" />
+        </svg>
+        <span class="tw-dot"></span>
+    </button>
+</div>
+
+<script>
+    (function () {
+        var widget = document.getElementById('twWidget');
+        var bubble = document.getElementById('twBubble');
+
+        function setOpen(open) {
+            widget.classList.toggle('is-open', open);
+            bubble.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+
+        bubble.addEventListener('click', function (e) {
+            e.stopPropagation();
+            setOpen(!widget.classList.contains('is-open'));
+        });
+        document.addEventListener('click', function (e) {
+            if (!widget.contains(e.target)) setOpen(false);
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') setOpen(false);
+        });
+    })();
+</script>

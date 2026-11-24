@@ -1,0 +1,71 @@
+﻿@model List<GetProductsWithCategoryDto>
+@{
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+
+<div class="content">
+    <div class="container-fluid">
+        <h4 class="page-title">Ürünler</h4>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Ürün Listesi</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Görsel</th>
+                                    <th scope="col">Ürün Adı</th>
+                                    <th scope="col">Açıklama</th>
+                                    <th scope="col">Fiyat</th>
+                                    <th scope="col">Kategori Adı</th>
+                                    <th scope="col">Ürün Durumu</th>
+                                    <th scope="col">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{ int count = 0; }
+                                @foreach (var item in Model ?? new List<GetProductsWithCategoryDto>())
+                                {
+                                    count++;
+                                    <tr>
+                                        <td>@count</td>
+                                        <td><img src="@item.ImageUrl" style="width:80px;height:80px;border-radius:20px"/></td>
+                                        <td>@item.ProductName</td>
+                                        <td>@item.Description</td>
+                                        <td>@item.Price</td>
+                                        <td>@item.CategoryName</td>
+                                        <td>@(item.Status ? "Aktif" : "Pasif")</td>
+                                        <td style="white-space:nowrap;">
+                                            @if (item.Status)
+                                            {
+                                                <a href="/Product/ChangeProductStatus/@item.ProductId" class="btn btn-outline-secondary">Pasif Yap</a>
+                                            }
+                                            else
+                                            {
+                                                <a href="/Product/ChangeProductStatus/@item.ProductId" class="btn btn-outline-success">Aktif Yap</a>
+                                            }
+                                            <a href="/Product/UpdateProduct/@item.ProductId" class="btn btn-outline-warning">Düzenle</a>
+                                            <a href="/Product/DeleteProduct/@item.ProductId" class="btn btn-outline-danger">Sil</a>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (Model == null || !Model.Any())
+                                {
+                                    <tr><td colspan="8" class="text-center text-muted">Kayıt bulunamadı.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                        </div>
+                        <a href="/Product/CreateProduct" class="btn btn-outline-primary">Yeni Ürün Girişi</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

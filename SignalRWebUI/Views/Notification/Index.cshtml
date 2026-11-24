@@ -1,0 +1,67 @@
+@model List<ResultNotificationDto>
+@{
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+
+<div class="content">
+    <div class="container-fluid">
+        <h4 class="page-title">Bildirimler</h4>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Bildirim Listesi</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Tür</th>
+                                    <th scope="col">Açıklama</th>
+                                    <th scope="col">Tarih</th>
+                                    <th scope="col">Durum</th>
+                                    <th scope="col">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{ int count = 0; }
+                                @foreach (var item in Model ?? new List<ResultNotificationDto>())
+                                {
+                                    count++;
+                                    <tr>
+                                        <td>@count</td>
+                                        <td>@item.Type</td>
+                                        <td>@item.Description</td>
+                                        <td>@item.AtDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>@(item.Status ? "Okundu" : "Okunmadı")</td>
+                                        <td style="white-space:nowrap;">
+                                            @if (item.Status)
+                                            {
+                                                <a href="/Notification/ChangeNotificationStatus/@item.NotificationId" class="btn btn-outline-secondary">Okunmadı Yap</a>
+                                            }
+                                            else
+                                            {
+                                                <a href="/Notification/ChangeNotificationStatus/@item.NotificationId" class="btn btn-outline-success">Okundu Yap</a>
+                                            }
+                                            <a href="/Notification/UpdateNotification/@item.NotificationId" class="btn btn-outline-warning">Düzenle</a>
+                                            <a href="/Notification/DeleteNotification/@item.NotificationId" class="btn btn-outline-danger">Sil</a>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (Model == null || !Model.Any())
+                                {
+                                    <tr><td colspan="6" class="text-center text-muted">Kayıt bulunamadı.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                        </div>
+                        <a href="/Notification/CreateNotification" class="btn btn-outline-primary">Yeni Bildirim Girişi</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

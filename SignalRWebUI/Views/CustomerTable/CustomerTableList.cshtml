@@ -1,0 +1,224 @@
+﻿@model List<ResultRestaurantTableDto>
+@{
+    Layout = null;
+    var tables = Model ?? new List<ResultRestaurantTableDto>();
+    int emptyCount = tables.Count(x => x.Status == 0);
+    int fullCount = tables.Count(x => x.Status == 1);
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Masanı Seç</title>
+    <link rel="shortcut icon" href="~/feane-1.0.0/images/favicon.png" type="image/x-icon" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Open Sans', 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f1f2f3;
+            color: #222831;
+            min-height: 100vh;
+        }
+
+        /* Üst alan */
+        .hero {
+            background: linear-gradient(135deg, #222831 0%, #2f3640 100%);
+            color: #fff;
+            text-align: center;
+            padding: 56px 20px 90px;
+            position: relative;
+        }
+        .hero .brand { color: #ffbe33; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 14px; }
+        .hero h1 { font-size: 38px; margin: 10px 0 10px; font-weight: 700; }
+        .hero p { color: rgba(255,255,255,.7); max-width: 520px; margin: 0 auto; line-height: 1.6; }
+
+        .wrap { max-width: 1100px; margin: -54px auto 60px; padding: 0 20px; position: relative; z-index: 1; }
+
+        /* Özet ve filtre */
+        .toolbar {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 28px rgba(0,0,0,.1);
+            padding: 16px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .legend { display: flex; gap: 22px; flex-wrap: wrap; }
+        .legend .item { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #6b7280; }
+        .legend .item b { font-size: 20px; color: #222831; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .dot-total { background: #ffbe33; }
+        .dot-empty { background: #10b981; }
+        .dot-full { background: #ef4444; }
+
+        .filters { display: flex; gap: 8px; }
+        .filters button {
+            border: 0;
+            background: #f1f2f3;
+            color: #222831;
+            font-weight: 600;
+            padding: 9px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all .2s ease;
+            font-family: inherit;
+        }
+        .filters button:hover { background: #ffe9b8; }
+        .filters button.active { background: #222831; color: #ffbe33; }
+
+        /* Masa kartları */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 22px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 28px 22px 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 22px rgba(0,0,0,.08);
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+        }
+        .card.is-empty::before { background: #10b981; }
+        .card.is-full::before { background: #ef4444; }
+        .card.is-empty:hover { transform: translateY(-6px); box-shadow: 0 16px 32px rgba(0,0,0,.14); }
+        .card.is-full { opacity: .78; }
+
+        .icon {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            margin: 6px auto 16px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .is-empty .icon { background: #e7f8f1; color: #10b981; }
+        .is-full .icon { background: #fdecec; color: #ef4444; }
+        .icon svg { width: 34px; height: 34px; }
+
+        .name { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+        .status {
+            display: inline-flex; align-items: center; gap: 7px;
+            font-size: 13px; font-weight: 600;
+            padding: 5px 14px; border-radius: 30px;
+            margin-bottom: 20px;
+        }
+        .is-empty .status { background: #e7f8f1; color: #0b8a62; }
+        .is-full .status { background: #fdecec; color: #c53030; }
+        .is-empty .status .dot { background: #10b981; }
+        .is-full .status .dot { background: #ef4444; }
+
+        .btn-sit {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: 0;
+            border-radius: 40px;
+            background: #ffbe33;
+            color: #222831;
+            font-weight: 700;
+            font-size: 15px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all .2s ease;
+            font-family: inherit;
+        }
+        .btn-sit:hover { background: #222831; color: #ffbe33; }
+        .btn-sit.disabled {
+            background: #e5e7eb;
+            color: #9ca3af;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: #6b7280; grid-column: 1 / -1; }
+
+        @@media (max-width: 576px) {
+            .hero h1 { font-size: 28px; }
+            .toolbar { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <div class="brand">Feane Restaurant</div>
+        <h1>Masanı Seç</h1>
+        <p>Boş bir masa seçip &ldquo;Masaya Otur&rdquo; butonuna dokunun, siparişinizi o masadan verebilirsiniz.</p>
+    </header>
+
+    <main class="wrap">
+        @if (TempData["TableError"] != null)
+        {
+            <div style="background:#fdecec;color:#c53030;padding:12px 18px;border-radius:12px;margin-bottom:18px;">@TempData["TableError"]</div>
+        }
+        <div class="toolbar">
+            <div class="legend">
+                <div class="item"><span class="dot dot-total"></span><b id="tableCount">@tables.Count</b> Toplam</div>
+                <div class="item"><span class="dot dot-empty"></span><b id="emptyCount">@emptyCount</b> Boş</div>
+                <div class="item"><span class="dot dot-full"></span><b id="fullCount">@fullCount</b> Dolu</div>
+            </div>
+            <div class="filters">
+                <button type="button" class="active" data-filter="all">Tümü</button>
+                <button type="button" data-filter="is-empty">Boş</button>
+                <button type="button" data-filter="is-full">Dolu</button>
+            </div>
+        </div>
+
+        <div class="grid" id="tableListBody">
+            @if (!tables.Any())
+            {
+                <div class="empty-state">Şu an listelenecek masa bulunamadı.</div>
+            }
+            @foreach (var item in tables)
+            {
+                var isFull = item.Status == 1;
+                <div class="card @(isFull ? "is-full" : "is-empty")">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10" />
+                            <path d="M17 3c-2 1.5-3 4-3 7 0 1.5 1 2 3 2V3zM17 12v9" />
+                        </svg>
+                    </div>
+                    <div class="name">@item.TableName</div>
+                    <div class="status"><span class="dot"></span>@(isFull ? "Dolu" : "Boş")</div>
+
+                    @if (isFull)
+                    {
+                        <span class="btn-sit disabled">Masa Dolu</span>
+                    }
+                    else
+                    {
+                        <a href="/CustomerTable/Join/@item.RestaurantTableId" class="btn-sit">Masaya Otur</a>
+                    }
+                </div>
+            }
+        </div>
+    </main>
+
+    <script>
+        document.querySelectorAll('.filters button').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.filters button').forEach(function (b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                var f = btn.getAttribute('data-filter');
+                document.querySelectorAll('#tableListBody .card').forEach(function (card) {
+                    card.style.display = (f === 'all' || card.classList.contains(f)) ? '' : 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

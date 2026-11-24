@@ -1,0 +1,13 @@
+﻿@{
+    Layout = "~/Views/UILayout/Index.cshtml";
+}
+
+@section Hero {
+    @await Component.InvokeAsync("MainSlider")
+}
+
+@await Component.InvokeAsync("MainOffer")
+@await Component.InvokeAsync("MainFood")
+@await Component.InvokeAsync("MainAbout")
+@await Component.InvokeAsync("MainBook")
+@await Component.InvokeAsync("MainClient")

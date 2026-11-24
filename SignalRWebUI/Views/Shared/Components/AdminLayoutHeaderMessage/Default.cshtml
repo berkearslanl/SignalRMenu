@@ -1,0 +1,24 @@
+@model List<ResultMessageDto>
+
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(() => {
+		var connection = new signalR.HubConnectionBuilder().withUrl("https://localhost:7003/SignalRHub").build();
+        connection.start().then(() => {}).catch((err) => { console.log(err) });
+        connection.on("ReceiveMessageCount", (messageCountValue) => {
+            $("#messageCount").text(messageCountValue);
+		});
+	});
+</script>
+<li class="nav-item dropdown hidden-caret">
+    <a class="nav-link dropdown-toggle" href="#" id="messageDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="la la-envelope"></i>
+        <span class="notification" id="messageCount">@Model.Count</span>
+    </a>
+    <div class="dropdown-menu" aria-labelledby="messageDropdown">
+        <a class="dropdown-item" href="/AdminMessage/Index">Gelen Mesajlar</a>
+        <a class="dropdown-item" href="/MainMessage/Index">Mesaj Yaz</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="/Message/Index">Canlı Mesajlaşma</a>
+    </div>
+</li>

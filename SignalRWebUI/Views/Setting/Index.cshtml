@@ -1,0 +1,94 @@
+﻿@model ResultUserInfoDto
+@{
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+    var first = string.IsNullOrEmpty(Model?.Name) ? "" : Model.Name.Substring(0, 1);
+    var last = string.IsNullOrEmpty(Model?.Surname) ? "" : Model.Surname.Substring(0, 1);
+    var initials = (first + last).ToUpper();
+}
+
+<style>
+    .setting-avatar {
+        width: 96px; height: 96px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1d62f0, #1a2035);
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 34px; font-weight: 700;
+        margin: 0 auto 14px;
+    }
+    .setting-side { text-align: center; }
+    .setting-side h4 { margin-bottom: 2px; font-weight: 700; }
+    .setting-side .text-muted { font-size: 13px; }
+    .setting-form .form-group label { font-weight: 600; font-size: 13px; }
+    .setting-form .form-control { height: 44px; }
+</style>
+
+<div class="content">
+    <div class="container-fluid">
+        <h4 class="page-title">Ayarlar</h4>
+
+        @if (TempData["SettingSuccess"] != null)
+        {
+            <div class="alert alert-success">@TempData["SettingSuccess"]</div>
+        }
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">@ViewBag.Error</div>
+        }
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body setting-side">
+                        <div class="setting-avatar">@initials</div>
+                        <h4>@Model?.Name @Model?.Surname</h4>
+                        <div class="text-muted">@Model?.Username</div>
+                        <div class="text-muted">@Model?.Email</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <form method="post" class="setting-form">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Hesap Bilgilerim</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Ad</label>
+                                        <input type="text" class="form-control" asp-for="Name" placeholder="Adınızı giriniz" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Soyad</label>
+                                        <input type="text" class="form-control" asp-for="Surname" placeholder="Soyadınızı giriniz" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Kullanıcı Adı</label>
+                                <input type="text" class="form-control" asp-for="Username" placeholder="Kullanıcı adınızı giriniz" required>
+                            </div>
+                            <div class="form-group">
+                                <label>E-posta</label>
+                                <input type="email" class="form-control" asp-for="Email" placeholder="E-posta adresinizi giriniz" required>
+                            </div>
+                            <div class="form-group">
+                                <label>E-posta</label>
+                                <input type="password" class="form-control" asp-for="Password" placeholder="Şifrenizi giriniz" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <button type="submit" class="btn btn-success">Güncelle</button>
+                        <a href="/Dashboard/Index" class="btn btn-danger">İptal</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

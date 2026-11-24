@@ -1,0 +1,62 @@
+﻿@model CreateBookingDto
+<section class="book_section layout_padding">
+    <div class="container">
+        <div class="heading_container">
+            <h2>
+                Rezervasyon Oluştur
+            </h2>
+        </div>
+        @if (TempData["BookingSuccess"] != null)
+        {
+            <div class="alert alert-success">@TempData["BookingSuccess"]</div>
+        }
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form_container">
+                    <form method="post" asp-controller="MainBook" asp-action="Index">
+                        <div>
+                            <input type="text" class="form-control" placeholder="Adınız Soyadınız" asp-for="Name" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div>
+                            <input type="text" class="form-control" placeholder="Telefon Numaranız" asp-for="Phone" />
+                            <span asp-validation-for="Phone" class="text-danger"></span>
+                        </div>
+                        <div>
+                            <input type="email" class="form-control" placeholder="Mail Adresiniz" asp-for="Email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div>
+                            <select class="form-control nice-select wide" asp-for="PersonCount">
+                                <option value="" disabled selected>
+                                    Kaç kişi olacaksınız?
+                                </option>
+                                @for (int i = 1; i <= 6; i++)
+                                {
+                                    <option value="@i">@i</option>
+                                }
+                            </select>
+                            <span asp-validation-for="PersonCount" class="text-danger"></span>
+                        </div>
+                        <div>
+                            <input type="datetime-local" asp-for="BookDate" class="form-control">
+                            <span asp-validation-for="BookDate" class="text-danger"></span>
+                        </div>
+                        <div class="btn_box">
+                            <button>
+                                Rezervasyonu Onayla
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="map_container ">
+                    <div class="map_container">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3012.0040696773553!2d29.082145711362553!3d40.981391720960644!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cac7b6f09a5c0d%3A0x59d14e224634cb31!2zQXRhdMO8cmsgQ2QuLCBLYWTEsWvDtnkvxLBzdGFuYnVs!5e0!3m2!1str!2str!4v1795174888621!5m2!1str!2str" width="100%" height="400" style="border:0;" loading="lazy"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

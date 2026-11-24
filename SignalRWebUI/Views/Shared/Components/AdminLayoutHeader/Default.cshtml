@@ -1,0 +1,14 @@
+<div class="main-header">
+
+    @await Component.InvokeAsync("AdminLayoutHeaderLogo")
+    <nav class="navbar navbar-header navbar-expand-lg">
+        <div class="container-fluid">
+            @await Component.InvokeAsync("AdminLayoutHeaderSearch")
+            <ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
+                @await Component.InvokeAsync("AdminLayoutHeaderMessage")
+                @await Component.InvokeAsync("AdminLayoutHeaderNotification")
+                @await Component.InvokeAsync("AdminLayoutHeaderUser")
+            </ul>
+        </div>
+    </nav>
+</div>

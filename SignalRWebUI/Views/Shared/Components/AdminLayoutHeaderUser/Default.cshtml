@@ -1,0 +1,21 @@
+@model ResultUserInfoDto
+<li class="nav-item dropdown">
+    <a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="#" aria-expanded="false"> <img src="~/Ready-Bootstrap-Dashboard-master/assets/img/profile.jpg" alt="user-img" width="36" class="img-circle"><span>@(Model.Name ?? "-") @(Model.Surname ?? "-")</span></a>
+    <ul class="dropdown-menu dropdown-user">
+        <li>
+            <div class="user-box">
+                <div class="u-img"><img src="~/Ready-Bootstrap-Dashboard-master/assets/img/profile.jpg" alt="user"></div>
+                <div class="u-text">
+                    <h4>@(Model.Username ?? "-")</h4>
+                    <p class="text-muted">@(Model.Email ?? "Admin")</p><a href="/Setting/Index" class="btn btn-rounded btn-danger btn-sm">Profili Gör</a>
+                </div>
+            </div>
+        </li>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="/Setting/Index"><i class="ti-user"></i> Bilgilerim</a>
+        <a class="dropdown-item" href="/MoneyCase/Index"><i class="ti-cash"></i> Kasa</a>
+        <a class="dropdown-item" href="/AdminMessage/Index"><i class="ti-email"></i> Gelen Kutusu</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="/Identity/LogOut"><i class="fa fa-power-off"></i> Çıkış Yap</a>
+    </ul>
+</li>

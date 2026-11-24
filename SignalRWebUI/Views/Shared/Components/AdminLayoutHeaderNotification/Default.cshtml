@@ -1,0 +1,179 @@
+@model List<ResultNotificationDto>
+<style>
+    .notif-center a {
+        display: flex;
+        align-items: center;
+    }
+
+        .notif-center a .notif-icon,
+        .notif-center a .notif-img {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            margin-right: 15px;
+        }
+
+            .notif-center a .notif-icon i {
+                line-height: 40px;
+            }
+
+        .notif-center a .notif-content {
+            flex: 1;
+            min-width: 0;
+            padding: 0;
+        }
+</style>
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+
+
+<script type="text/javascript">
+    var connection = new signalR.HubConnectionBuilder().withUrl("https://localhost:7003/SignalRHub").build();
+
+    connection.on("ReceiveNotificationCount", (notificationCount) => {
+        document.getElementById("notificationCount").textContent = notificationCount;
+        document.getElementById("notificationCount2").textContent = notificationCount;
+    });
+
+    connection.on("ReceiveNotificationList", (notifications) => {
+        var html = "";
+        notifications.forEach((item) => {
+            var className = "";
+            var colorClass = "";
+            var timeText = "";
+            var minutes = (new Date() - new Date(item.atDate)) / 60000;
+            if (minutes < 1) timeText = "Az önce";
+            else if (minutes < 60) timeText = Math.floor(minutes) + " dakika önce";
+            else if (minutes < 1440) timeText = Math.floor(minutes / 60) + " saat önce";
+            else if (minutes < 43200) timeText = Math.floor(minutes / 1440) + " gün önce";
+            else timeText = Math.floor(minutes / 43200) + " ay önce";
+
+            switch (item.type) {
+                case "Rezervasyon":
+                    className = "la la-calendar-check-o";
+                    colorClass = "notif-primary";
+                    break;
+                case "Yorum":
+                    className = "la la-comment";
+                    colorClass = "notif-success";
+                    break;
+                case "Sipariş":
+                    className = "la la-shopping-cart";
+                    colorClass = "notif-warning";
+                    break;
+                case "Masa":
+                    className = "la la-th-large";
+                    colorClass = "notif-danger";
+                    break;
+                case "Mesaj":
+                    className = "la la-envelope";
+                    colorClass = "notif-primary";
+                    break;
+                default:
+                    className = "la la-bell";
+                    colorClass = "notif-primary";
+                    break;
+            }
+            html += `
+                            <a href="/Notification/ChangeNotificationStatus/${item.notificationId}" >
+                            <div class="notif-icon ${colorClass}"> <i class="${className}"></i> </div>
+                            <div class="notif-content">
+                                <span class="block">
+                                    ${item.description}
+                                </span>
+                                <span class="time">${timeText}</span>
+                            </div>
+                        </a>`;
+        });
+        document.getElementById("notificationListBody").innerHTML = html;
+    });
+
+    connection.start().then(() => {
+        setInterval(() => {
+            connection.invoke("GetNotificationList");
+        }, 3000);
+    }).catch((err) => { console.log(err) });
+</script>
+
+<li class="nav-item dropdown hidden-caret">
+    <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="la la-bell"></i>
+        <span class="notification" id="notificationCount">@Model.Count</span>
+    </a>
+    <ul class="dropdown-menu notif-box" aria-labelledby="notificationDropdown">
+        <li>
+            <div class="dropdown-title"><span id="notificationCount2">@Model.Count</span> Bildiriminiz Var</div>
+        </li>
+        <li>
+            <div class="notif-center" id="notificationListBody">
+                @foreach (var item in Model)
+                {
+                    var className = "";
+                    var colorClass = "";
+                    var timeText = "";
+                    var span = DateTime.Now - item.AtDate;
+                    if (span.TotalMinutes < 1)
+                    {
+                        timeText = "Az önce";
+                    }
+                    else if (span.TotalMinutes < 60)
+                    {
+                        timeText = (int)span.TotalMinutes + " dakika önce";
+                    }
+                    else if (span.TotalHours < 24)
+                    {
+                        timeText = (int)span.TotalHours + " saat önce";
+                    }
+                    else if (span.TotalDays < 30)
+                    {
+                        timeText = (int)span.TotalDays + " gün önce";
+                    }
+                    else
+                    {
+                        timeText = (int)(span.TotalDays / 30) + " ay önce";
+                    }
+
+                    switch (item.Type)
+                    {
+                        case "Rezervasyon":
+                            className = "la la-calendar-check-o";
+                            colorClass = "notif-primary";
+                            break;
+                        case "Yorum":
+                            className = "la la-comment";
+                            colorClass = "notif-success";
+                            break;
+                        case "Sipariş":
+                            className = "la la-shopping-cart";
+                            colorClass = "notif-warning";
+                            break;
+                        case "Masa":
+                            className = "la la-th-large";
+                            colorClass = "notif-danger";
+                            break;
+                        case "Mesaj":
+                            className = "la la-envelope";
+                            colorClass = "notif-primary";
+                            break;
+                        default:
+                            className = "la la-bell";
+                            colorClass = "notif-primary";
+                            break;
+                    }
+                    <a href="/Notification/ChangeNotificationStatus/@item.NotificationId">
+                        <div class="notif-icon @colorClass"> <i class="@className"></i> </div>
+                        <div class="notif-content">
+                            <span class="block">
+                                @item.Description
+                            </span>
+                            <span class="time">@timeText</span>
+                        </div>
+                    </a>
+                }
+            </div>
+        </li>
+        <li>
+            <a class="see-all" href="/Notification/Index"> <strong>Tüm Bildirimleri Gör</strong> <i class="la la-angle-right"></i> </a>
+        </li>
+    </ul>
+</li>

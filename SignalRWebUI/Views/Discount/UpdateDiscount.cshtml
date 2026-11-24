@@ -1,0 +1,48 @@
+﻿@model UpdateDiscountDto
+@{
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+<div class="content">
+    <div class="container-fluid">
+        <h4 class="page-title">İndirimler</h4>
+        <div class="row">
+            <div class="col-md-12">
+                <form method="post">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">İndirim Güncelleme Sayfası</div>
+                        </div>
+                        <div class="card-body">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <input type="hidden" asp-for="DiscountId" />
+                                <label>Başlık</label>
+                                <input type="text" class="form-control" asp-for="Title" placeholder="Başlığı giriniz" required>
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>İndirim Miktarı</label>
+                                <input type="text" class="form-control" asp-for="Amount" placeholder="İndirim miktarını giriniz" required>
+                                <span asp-validation-for="Amount" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Açıklama</label>
+                                <input type="text" class="form-control" asp-for="Description" placeholder="Açıklamayı giriniz" required>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Resim Yolu</label>
+                                <input type="text" class="form-control" asp-for="ImageUrl" placeholder="Resim yolu giriniz" required>
+                                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <button type="submit" class="btn btn-success">Kaydet</button>
+                        <a href="/Discount/Index" class="btn btn-danger">İptal</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

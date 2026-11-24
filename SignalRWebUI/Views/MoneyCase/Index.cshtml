@@ -1,0 +1,75 @@
+﻿@model decimal
+@{
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+<style>
+    .money-card .icon-big {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: rgba(40, 167, 69, .12);
+        color: #28a745;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 44px;
+        margin: 0 auto 18px;
+    }
+
+    .money-card .money-label {
+        font-size: 15px;
+        color: #8d9498;
+        letter-spacing: .5px;
+        text-transform: uppercase;
+    }
+
+    .money-card .money-amount {
+        font-size: 48px;
+        font-weight: 800;
+        color: #1a2035;
+        margin: 6px 0 0;
+    }
+</style>
+
+
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+
+<script type="text/javascript">
+
+    var moneyCaseConnection = new signalR.HubConnectionBuilder().withUrl("https://localhost:7003/SignalRHub").build();
+
+    moneyCaseConnection.start().then(() => {
+        setInterval(() => {
+            moneyCaseConnection.invoke("SendMoneyCase");
+        }, 1000);
+    }).catch((err) => { console.log(err) });
+
+    moneyCaseConnection.on("ReceiveMoneyCase", (moneys) => {
+        $("#totalAmount").text(moneys);
+    });
+
+</script>
+
+<div class="content">
+    <div class="container-fluid">
+        <h4 class="page-title">Kasa</h4>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">@ViewBag.Error</div>
+        }
+
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="card money-card">
+                    <div class="card-body text-center py-5">
+                        <div class="icon-big"><i class="la la-money"></i></div>
+                        <div class="money-label">Kasadaki Toplam Tutar</div>
+                        <h2 class="money-amount" id="totalAmount">@Model.ToString("N2", new System.Globalization.CultureInfo("tr-TR")) ₺</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,370 @@
+﻿@model List<GetBasketWithProductAndTableDto>
+@{
+    Layout = "~/Views/UILayout/Index.cshtml";
+    int count = 0;
+    decimal subtotal = Model.Sum(x => x.TotalPrice);
+    decimal kdvRate = 0.20m;
+    decimal kdvAmount = subtotal * kdvRate;
+    decimal grandTotal = subtotal + kdvAmount;
+}
+
+<style>
+    .basket_section {
+        padding: 60px 0 90px;
+        background: #f1f2f3;
+    }
+
+    /* Breadcrumb */
+    .basket-breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin-bottom: 25px;
+    }
+
+        .basket-breadcrumb a {
+            color: #222831;
+        }
+
+            .basket-breadcrumb a:hover {
+                color: #ffbe33;
+                text-decoration: none;
+            }
+
+        .basket-breadcrumb .active {
+            color: #ffbe33;
+            font-weight: 600;
+        }
+
+    /* Ürün tablosu */
+    .basket-card {
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 6px 18px rgba(0,0,0,.08);
+        overflow: hidden;
+    }
+
+    .basket-table {
+        margin: 0;
+    }
+
+        .basket-table thead th {
+            background: #222831;
+            color: #fff;
+            border: 0;
+            padding: 16px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .basket-table td, .basket-table tbody th {
+            padding: 16px;
+            vertical-align: middle;
+            border-top: 1px solid #f1f2f3;
+        }
+
+        .basket-table tbody tr {
+            transition: background .2s ease;
+        }
+
+            .basket-table tbody tr:hover {
+                background: #fff8e6;
+            }
+
+    .basket-product {
+        font-weight: 600;
+        color: #222831;
+        text-align: left;
+    }
+
+    .qty-badge {
+        display: inline-block;
+        min-width: 38px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        background: #f1f2f3;
+        font-weight: 600;
+    }
+
+    .price-total {
+        font-weight: 700;
+        color: #222831;
+    }
+
+    .btn-delete-basket {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 0;
+        background: #fdecec;
+        color: #dc3545;
+        transition: all .2s ease;
+    }
+
+        .btn-delete-basket:hover {
+            background: #dc3545;
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+    /* Kupon */
+    .coupon-box {
+        background: #fff;
+        border-radius: 15px;
+        padding: 18px;
+        box-shadow: 0 6px 18px rgba(0,0,0,.08);
+        margin-bottom: 25px;
+    }
+
+        .coupon-box .form-control {
+            border-radius: 45px;
+            border: 1px solid #e3e4e6;
+            height: 48px;
+            padding: 0 20px;
+        }
+
+            .coupon-box .form-control:focus {
+                border-color: #ffbe33;
+                box-shadow: 0 0 0 .15rem rgba(255,190,51,.25);
+            }
+
+    .btn-coupon {
+        height: 48px;
+        border-radius: 45px;
+        background: #222831;
+        color: #fff !important;
+        padding: 0 22px;
+        display: inline-flex;
+        align-items: center;
+        margin-left: 10px;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+
+        .btn-coupon i {
+            color: #fff !important;
+        }
+
+        .btn-coupon:hover {
+            background: #ffbe33;
+            color: #222831 !important;
+            text-decoration: none;
+        }
+
+            .btn-coupon:hover i {
+                color: #222831 !important;
+            }
+
+    /* Sepet özeti */
+    .summary-card {
+        background: #222831;
+        color: #fff;
+        border-radius: 15px;
+        padding: 28px;
+        box-shadow: 0 10px 25px rgba(0,0,0,.2);
+    }
+
+        .summary-card h5 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 30px;
+            color: #ffbe33;
+            margin-bottom: 20px;
+        }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px dashed rgba(255,255,255,.15);
+    }
+
+        .summary-row h6 {
+            margin: 0;
+            font-weight: 400;
+        }
+
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 18px;
+    }
+
+        .summary-total h5, .summary-total h4 {
+            margin: 0;
+            font-family: inherit;
+            color: #fff;
+            font-size: 20px;
+        }
+
+        .summary-total .amount {
+            color: #ffbe33;
+            font-weight: 700;
+            font-size: 26px;
+        }
+
+    .btn-checkout {
+        display: block;
+        width: 100%;
+        margin-top: 24px;
+        padding: 14px;
+        border: 0;
+        border-radius: 45px;
+        background: #ffbe33;
+        color: #222831;
+        font-weight: 700;
+        transition: all .2s ease;
+    }
+
+        .btn-checkout:hover {
+            background: #fff;
+            transform: translateY(-2px);
+        }
+
+    /* Boş sepet */
+    .empty-basket {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+        .empty-basket i {
+            font-size: 64px;
+            color: #ffbe33;
+            margin-bottom: 20px;
+        }
+</style>
+
+<section class="basket_section">
+    <div class="container">
+        <div class="heading_container heading_center mb-4">
+            <h2>Sepetim</h2>
+        </div>
+
+        <nav class="breadcrumb basket-breadcrumb">
+            <a class="breadcrumb-item" href="/Main/Index">Ana Sayfa</a>
+            <a class="breadcrumb-item" href="/MainMenu/Index">Menü</a>
+            <span class="breadcrumb-item active">Sepetim</span>
+        </nav>
+
+        @if (!Model.Any())
+        {
+            <div class="basket-card empty-basket">
+                <i class="fa fa-shopping-basket"></i>
+                <h4>Sepetiniz şu an boş</h4>
+                <p class="text-muted">Menüden lezzetli ürünler ekleyerek siparişinizi oluşturabilirsiniz.</p>
+                <a href="/MainMenu/Index" class="btn1" style="display:inline-block;padding:10px 40px;background:#ffbe33;color:#222831;border-radius:45px;">Menüye Git</a>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-lg-8 mb-4">
+                    <div class="basket-card table-responsive">
+                        <table class="table basket-table text-center">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th class="text-left">Ürün</th>
+                                    <th>Adet</th>
+                                    <th>Birim Fiyat</th>
+                                    <th>Toplam</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    count++;
+                                    <tr>
+                                        <th>@count</th>
+                                        <td class="basket-product">@item.ProductName</td>
+                                        <td><span class="qty-badge">@item.Count</span></td>
+                                        <td>@item.UnitPrice.ToString("N2") ₺</td>
+                                        <td class="price-total">@item.TotalPrice.ToString("N2") ₺</td>
+                                        <td>
+                                            <button type="button" data-basket-id="@item.BasketId" class="btn-delete-basket" title="Sepetten kaldır">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="coupon-box">
+                        <form onsubmit="return false;">
+                            <div class="input-group flex-nowrap">
+                                <input type="text" id="couponcode" class="form-control" placeholder="Kupon kodunuz" />
+                                <a class="btn-coupon" id="btncouponcode"><i class="fa fa-tag mr-2"></i>Uygula</a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="summary-card">
+                        <h5>Sepet Özeti</h5>
+                        <div class="summary-row">
+                            <h6>Ara Toplam</h6>
+                            <h6><span id="totalprice">@subtotal.ToString("N2")</span> ₺</h6>
+                        </div>
+                        <div class="summary-row">
+                            <h6>KDV (<span id="kdv">%@((int)(kdvRate * 100))</span>)</h6>
+                            <h6><span id="kdvamount">@kdvAmount.ToString("N2")</span> ₺</h6>
+                        </div>
+                        <div class="summary-total">
+                            <h5>Genel Toplam</h5>
+                            <span class="amount"><span id="totalpricewithkdv">@grandTotal.ToString("N2")</span> ₺</span>
+                        </div>
+                        <button id="btnchecked" class="btn-checkout">Siparişi Tamamla</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(document).on("click", ".btn-delete-basket", function () {
+            var basketId = $(this).data("basket-id");
+
+            $.ajax({
+                url: "/Basket/DeleteBasket",
+                type: "POST",
+                data: { id: basketId },
+                success: function (result) {
+                    if (result.success) {
+                        location.reload();
+                    }
+                    else {
+                        alert("Silme işlemi başarısız oldu.");
+                    }
+                },
+                error: function () {
+                    alert("Bir hata oluştu.");
+                }
+            });
+        });
+
+        $(document).on("click", "#btnchecked", function () {
+            var btn = $(this);
+            btn.prop("disabled", true);
+
+            $.ajax({
+                url: "/Basket/CompleteOrder",
+                type: "POST",
+                success: function (result) {
+                    if (result.success) {
+                        alert("Siparişiniz alındı. Afiyet olsun!");
+                        location.reload();
+                    }
+                },
+                error: function (xhr) {
+                    alert(xhr.responseText || "Sipariş verilemedi.");
+                    btn.prop("disabled", false);
+                }
+            });
+        });
+    </script>
+}

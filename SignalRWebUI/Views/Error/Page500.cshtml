@@ -1,0 +1,69 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>500 - Sunucu Hatası</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            color: #fff;
+            text-align: center;
+            background: #222831;
+            background-image:
+                radial-gradient(circle at 15% 20%, rgba(255, 190, 51, .18), transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(255, 190, 51, .10), transparent 45%);
+        }
+        .error-box { max-width: 520px; }
+        .error-icon {
+            width: 84px; height: 84px;
+            margin: 0 auto 18px;
+            border-radius: 50%;
+            background: rgba(255, 190, 51, .15);
+            color: #ffbe33;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .error-icon svg { width: 42px; height: 42px; }
+        .error-code { font-size: 120px; font-weight: 800; line-height: 1; margin: 0; color: #ffbe33; }
+        h1 { font-size: 28px; margin: 14px 0 10px; }
+        p { color: #aab2bd; line-height: 1.6; margin: 0 auto 30px; }
+        .actions a {
+            display: inline-block;
+            margin: 4px;
+            padding: 12px 34px;
+            border-radius: 45px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background .2s, color .2s;
+        }
+        .btn-main { background: #ffbe33; color: #222831; }
+        .btn-main:hover { background: #e69c00; }
+        .btn-ghost { border: 2px solid #ffbe33; color: #ffbe33; }
+        .btn-ghost:hover { background: #ffbe33; color: #222831; }
+    </style>
+</head>
+<body>
+    <div class="error-box">
+        <div class="error-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        </div>
+        <div class="error-code">500</div>
+        <h1>Sunucu Hatası</h1>
+        <p>Beklenmedik bir sorun oluştu. Lütfen biraz sonra tekrar deneyin, sorun devam ederse bizimle iletişime geçin.</p>
+        <div class="actions">
+            <a href="javascript:location.reload()" class="btn-main">Tekrar Dene</a>
+            <a href="/Main/Index" class="btn-ghost">Ana Sayfa</a>
+        </div>
+    </div>
+</body>
+</html>

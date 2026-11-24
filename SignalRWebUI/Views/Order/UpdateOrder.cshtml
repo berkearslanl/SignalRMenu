@@ -1,0 +1,50 @@
+@model UpdateOrderDto
+@{
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+<div class="content">
+    <div class="container-fluid">
+        <h4 class="page-title">Siparişler</h4>
+        <div class="row">
+            <div class="col-md-12">
+                <form method="post">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Sipariş Güncelleme Sayfası</div>
+                        </div>
+                        <div class="card-body">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <input type="hidden" asp-for="OrderID" />
+                                <label>Masa</label>
+                                <select asp-for="@Model.RestaurantTableId" asp-items="@ViewBag.Tables" class="form-control" required>
+                                    <option value="">Bir Masa Seçiniz</option>
+                                </select>
+                                <span asp-validation-for="RestaurantTableId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Açıklama</label>
+                                <input type="text" class="form-control" asp-for="Description" placeholder="Açıklamayı giriniz" required>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Toplam Tutar</label>
+                                <input type="text" class="form-control" asp-for="TotalPrice" placeholder="Tutarı giriniz (örn: 220,50)" required>
+                                <span asp-validation-for="TotalPrice" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Sipariş Tarihi</label>
+                                <input type="datetime-local" class="form-control" asp-for="OrderDate" required>
+                                <span asp-validation-for="OrderDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <button type="submit" class="btn btn-success">Kaydet</button>
+                        <a href="/Order/Index" class="btn btn-danger">İptal</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

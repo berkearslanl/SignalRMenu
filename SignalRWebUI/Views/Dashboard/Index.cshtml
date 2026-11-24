@@ -1,0 +1,428 @@
+﻿@{
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+
+<script>
+    var clientconnection = new signalR.HubConnectionBuilder().withUrl("https://localhost:7003/SignalRHub").build();
+    clientconnection.start().then(() => {
+        setInterval(() => {
+            clientconnection.invoke("DashboardValues");
+        }, 1000);
+    }).catch((err) => { console.log(err) });
+
+    clientconnection.on("ReceiveClientCount", (clientCount) => {
+        $("#clients").text(clientCount);
+    });
+    clientconnection.on("ReceiveAdminCount", (adminCount) => {
+        $("#admins").text(adminCount);
+    });
+    clientconnection.on("ReceiveTotalAmountMoneyCase", (totalAmountMoneyCase) => {
+        $("#caseMoneyTotal").text(totalAmountMoneyCase);
+    });
+    clientconnection.on("ReceiveActiveTableCount", (activeTableCount) => {
+        $("#activeTable").text(activeTableCount);
+    });
+    clientconnection.on("ReceiveDiscountCount", (discountCount) => {
+        $("#discount").text(discountCount);
+    });
+    clientconnection.on("ReceiveOrderCount", (orderCount) => {
+        $("#orders").text(orderCount);
+    });
+    clientconnection.on("ReceiveTestimonialCount", (testimonialCount) => {
+        $("#testimonials").text(testimonialCount);
+    });
+
+    clientconnection.on("ReceiveMenuTableCount", (tables) => {
+        var html = "";
+            html += `   <div class="d-flex justify-content-between mb-1">
+                             <span class="text-muted">Toplam Masa Sayısı</span>
+                             <span class="text-muted fw-bold"> ${tables}</span>
+                        </div>
+                        <div class="progress mb-2" style="height: 7px;">
+                             <div class="progress-bar bg-success" role="progressbar" style="width: ${tables}%" aria-valuenow="${tables}" aria-valuemin="0" aria-valuemax="100" data-toggle="tooltip" data-placement="top" title="${tables}%">
+                              </div>
+                        </div> `;
+        document.getElementById("totalTableCountProgress").innerHTML = html;
+    });
+
+    clientconnection.on("ReceiveAvgProductPrice", (avgProductPrice) => {
+        var price = Number(avgProductPrice);
+        var priceText = price.toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ₺";
+        var percent = Math.min(100, Math.round(price * 100 / 300));
+        var html = "";
+        html += `   <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted">Ortalama Ürün Fiyatı</span>
+                                                <span class="text-muted fw-bold"> ${priceText}</span>
+                                </div>
+                                <div class="progress mb-2" style="height: 7px;">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: ${percent}%" aria-valuenow="${percent}" aria-valuemin="0" aria-valuemax="100" data-toggle="tooltip" data-placement="top" title="${percent}%"></div>
+                                </div>`;
+        document.getElementById("avgProductPrice").innerHTML = html;
+    });
+
+    clientconnection.on("ReceiveProductCount", (totalProduct) => {
+        var html = "";
+        html += `   <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted">Toplam Ürün Sayısı</span>
+                                            <span class="text-muted fw-bold"> ${totalProduct}</span>
+                                </div>
+                                <div class="progress mb-2" style="height: 7px;">
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: ${totalProduct}%" aria-valuenow="${totalProduct}" aria-valuemin="0" aria-valuemax="100" data-toggle="tooltip" data-placement="top" title="${totalProduct}%"></div>
+                                </div>`;
+        document.getElementById("totalProductCount").innerHTML = html;
+    });
+
+    clientconnection.on("ReceiveActiveBookingCount", (activeBooking) => {
+        var html = "";
+        html += `   <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted">Yaklaşan Rezervasyon Sayısı</span>
+                                    <span class="text-muted fw-bold"> ${activeBooking}</span>
+                                </div>
+                                <div class="progress mb-2" style="height: 7px;">
+                                                <div class="progress-bar bg-warning" role="progressbar" style="width: ${activeBooking}%" aria-valuenow="${activeBooking}" aria-valuemin="0" aria-valuemax="100" data-toggle="tooltip" data-placement="top" title="${activeBooking}%"></div>
+                                </div>`;
+        document.getElementById("activeBookingCount").innerHTML = html;
+    });
+</script>
+
+<div class="content">
+    <div class="container-fluid">
+        <h4 class="page-title">Dashboard</h4>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card card-stats card-warning">
+                    <div class="card-body ">
+                        <div class="row">
+                            <div class="col-5">
+                                <div class="icon-big text-center">
+                                    <i class="la la-users"></i>
+                                </div>
+                            </div>
+                            <div class="col-7 d-flex align-items-center">
+                                <div class="numbers">
+                                    <p class="card-category">Anlık Kullanıcı</p>
+                                    <h4 class="card-title" id="clients"></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card card-stats card-success">
+                    <div class="card-body ">
+                        <div class="row">
+                            <div class="col-5">
+                                <div class="icon-big text-center">
+                                    <i class="la la-bar-chart"></i>
+                                </div>
+                            </div>
+                            <div class="col-7 d-flex align-items-center">
+                                <div class="numbers">
+                                    <p class="card-category">Admin Sayısı</p>
+                                    <h4 class="card-title" id="admins"></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card card-stats card-danger">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-5">
+                                <div class="icon-big text-center">
+                                    <i class="la la-newspaper-o"></i>
+                                </div>
+                            </div>
+                            <div class="col-7 d-flex align-items-center">
+                                <div class="numbers">
+                                    <p class="card-category">Referanslar</p>
+                                    <h4 class="card-title" id="testimonials"></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card card-stats card-primary">
+                    <div class="card-body ">
+                        <div class="row">
+                            <div class="col-5">
+                                <div class="icon-big text-center">
+                                    <i class="la la-check-circle"></i>
+                                </div>
+                            </div>
+                            <div class="col-7 d-flex align-items-center">
+                                <div class="numbers">
+                                    <p class="card-category">Siparişler</p>
+                                    <h4 class="card-title" id="orders"></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row row-card-no-pd">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="fw-bold mt-1">Kasadaki Tutar</p>
+                        <h4><b id="caseMoneyTotal"></b></h4>
+                        <a href="#" class="btn btn-primary btn-full text-left mt-3 mb-3"><i class="la la-plus"></i> Yeni Sipariş</a>
+                    </div>
+                    <div class="card-footer">
+                        <ul class="nav">
+                            <li class="nav-item"><a class="btn btn-default btn-link" href="/Order/Index"><i class="la la-history"></i> Geçmiş</a></li>
+                            <li class="nav-item ml-auto"><a class="btn btn-default btn-link" href="/Dashboard/Index"><i class="la la-refresh"></i> Yenile</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="progress-card" id="totalTableCountProgress"></div>
+
+                        <div class="progress-card" id="avgProductPrice"></div>
+
+                        <div class="progress-card" id="totalProductCount"></div>
+
+                        <div class="progress-card" id="activeBookingCount"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <p class="fw-bold mt-1">İstatistikler</p>
+                        <div class="row">
+                            <div class="col-5">
+                                <div class="icon-big text-center icon-warning">
+                                    <i class="la la-pie-chart text-warning"></i>
+                                </div>
+                            </div>
+                            <div class="col-7 d-flex align-items-center">
+                                <div class="numbers">
+                                    <p class="card-category">Boş Masalar</p>
+                                    <h4 class="card-title" id="activeTable"></h4>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="row">
+                            <div class="col-5">
+                                <div class="icon-big text-center">
+                                    <i class="la la-heart-o text-primary"></i>
+                                </div>
+                            </div>
+                            <div class="col-7 d-flex align-items-center">
+                                <div class="numbers">
+                                    <p class="card-category">Kampanyalar</p>
+                                    <h4 class="card-title" id="discount"></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Users Statistics</h4>
+                        <p class="card-category">
+                            Users statistics this month
+                        </p>
+                    </div>
+                    <div class="card-body">
+                        <div id="monthlyChart" class="chart chart-pie"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">2018 Sales</h4>
+                        <p class="card-category">
+                            Number of products sold
+                        </p>
+                    </div>
+                    <div class="card-body">
+                        <div id="salesChart" class="chart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header ">
+                        <h4 class="card-title">Table</h4>
+                        <p class="card-category">Users Table</p>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-head-bg-success table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">First</th>
+                                    <th scope="col">Last</th>
+                                    <th scope="col">Handle</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Mark</td>
+                                    <td>Otto</td>
+                                    <td>mdo</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Jacob</td>
+                                    <td>Thornton</td>
+                                    <td>fat</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td colspan="2">Larry the Bird</td>
+                                    <td>twitter</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-tasks">
+                    <div class="card-header ">
+                        <h4 class="card-title">Tasks</h4>
+                        <p class="card-category">To Do List</p>
+                    </div>
+                    <div class="card-body ">
+                        <div class="table-full-width">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input  select-all-checkbox" type="checkbox" data-select="checkbox" data-target=".task-select">
+                                                    <span class="form-check-sign"></span>
+                                                </label>
+                                            </div>
+                                        </th>
+                                        <th>Task</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input task-select" type="checkbox">
+                                                    <span class="form-check-sign"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>Planning new project structure</td>
+                                        <td class="td-actions text-right">
+                                            <div class="form-button-action">
+                                                <button type="button" data-toggle="tooltip" title="Edit Task" class="btn btn-link <btn-simple-primary">
+                                                    <i class="la la-edit"></i>
+                                                </button>
+                                                <button type="button" data-toggle="tooltip" title="Remove" class="btn btn-link btn-simple-danger">
+                                                    <i class="la la-times"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input task-select" type="checkbox">
+                                                    <span class="form-check-sign"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>Update Fonts</td>
+                                        <td class="td-actions text-right">
+                                            <div class="form-button-action">
+                                                <button type="button" data-toggle="tooltip" title="Edit Task" class="btn btn-link <btn-simple-primary">
+                                                    <i class="la la-edit"></i>
+                                                </button>
+                                                <button type="button" data-toggle="tooltip" title="Remove" class="btn btn-link btn-simple-danger">
+                                                    <i class="la la-times"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input task-select" type="checkbox">
+                                                    <span class="form-check-sign"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            Add new Post
+                                        </td>
+                                        <td class="td-actions text-right">
+                                            <div class="form-button-action">
+                                                <button type="button" data-toggle="tooltip" title="Edit Task" class="btn btn-link <btn-simple-primary">
+                                                    <i class="la la-edit"></i>
+                                                </button>
+                                                <button type="button" data-toggle="tooltip" title="Remove" class="btn btn-link btn-simple-danger">
+                                                    <i class="la la-times"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input task-select" type="checkbox">
+                                                    <span class="form-check-sign"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>Finalise the design proposal</td>
+                                        <td class="td-actions text-right">
+                                            <div class="form-button-action">
+                                                <button type="button" data-toggle="tooltip" title="Edit Task" class="btn btn-link <btn-simple-primary">
+                                                    <i class="la la-edit"></i>
+                                                </button>
+                                                <button type="button" data-toggle="tooltip" title="Remove" class="btn btn-link btn-simple-danger">
+                                                    <i class="la la-times"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer ">
+                        <div class="stats">
+                            <i class="now-ui-icons loader_refresh spin"></i> Updated 3 minutes ago
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

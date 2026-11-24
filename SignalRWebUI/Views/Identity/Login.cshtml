@@ -1,0 +1,68 @@
+﻿@model LoginDto
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Giriş Yap</title>
+    <link rel="stylesheet" href="~/css/identity.css" />
+</head>
+<body class="auth-body">
+    <div class="auth-wrap">
+
+        <!-- SOL PANEL -->
+        <div class="auth-side">
+            <div>
+                <div class="auth-brand">
+                    <div class="auth-brand-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v7a3 3 0 0 0 3 3v8" /><path d="M7 3v7" /><path d="M10 3v7a3 3 0 0 1-3 3" /><path d="M18 21V3c-2.5 1-4 4-4 8 0 2 1 3 4 3" /></svg>
+                    </div>
+                    <div class="auth-brand-name">SignalR<span>Menu</span></div>
+                </div>
+
+                <h2>Restoranını tek ekrandan yönet</h2>
+                <p>Siparişleri, masaları ve rezervasyonları anlık olarak takip et.</p>
+
+                <ul class="auth-features">
+                    <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4 10-10" /></svg></span>Anlık sipariş ve bildirim takibi</li>
+                    <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4 10-10" /></svg></span>Dolu / boş masa durumu</li>
+                    <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4 10-10" /></svg></span>Rezervasyon yönetimi</li>
+                </ul>
+            </div>
+            <div class="auth-side-foot">© SignalRMenu Yönetim Paneli</div>
+        </div>
+
+        <!-- FORM -->
+        <div class="auth-main">
+            <h1 class="auth-title">Giriş Yap</h1>
+            <p class="auth-sub">Yönetim paneline erişmek için bilgilerini gir</p>
+            <form asp-controller="Identity" asp-action="Login" method="post">
+                <div class="auth-group">
+                    <label for="Username">Kullanıcı Adı</label>
+                    <div class="auth-input">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>
+                        <input type="text" id="Username" name="Username" asp-for="Username" placeholder="Kullanıcı Adınız" required />
+                    </div>
+                </div>
+
+                <div class="auth-group">
+                    <label for="Password">Şifre</label>
+                    <div class="auth-input">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+                        <input type="password" id="Password" name="Password" asp-for="Password" placeholder="••••••••" required />
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-btn">Giriş Yap</button>
+            </form>
+
+            <div class="auth-footer">
+                Hesabın yok mu? <a asp-controller="Identity" asp-action="Register">Kayıt Ol</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

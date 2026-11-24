@@ -1,0 +1,29 @@
+﻿@{
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+<div class="content">
+    <div class="container-fluid">
+        <h4 class="page-title">QR Code</h4>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Qr Code Oluşturma</div>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            <input type="text" name="value" class="form-control" />
+                            <br />
+                            <input type="submit" value="QR Code Oluştur" class="btn btn-block btn-outline-dark" />
+                        </form>
+
+                        @if (ViewBag.QrCodeImage != null)
+                        {
+                            <img src="@ViewBag.QrCodeImage" style="width:400px;height:400px;" />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,278 @@
+﻿@model List<ResultRestaurantTableDto>
+@{
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+    int emptyCount = Model.Count(x => x.Status == 0);
+    int fullCount = Model.Count(x => x.Status == 1);
+}
+
+<style>
+    .table-summary {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+        .table-summary .item {
+            background: #fff;
+            border-radius: 14px;
+            padding: 14px 22px;
+            box-shadow: 0 4px 14px rgba(0,0,0,.06);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 150px;
+        }
+
+        .table-summary .num {
+            font-size: 26px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .table-summary .label {
+            font-size: 13px;
+            color: #8a8f98;
+        }
+
+        .table-summary .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+    .dot-total {
+        background: #6c7ae0;
+    }
+
+    .dot-empty {
+        background: #10b981;
+    }
+
+    .dot-full {
+        background: #ef4444;
+    }
+
+    .table-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .table-card {
+        position: relative;
+        border-radius: 20px;
+        padding: 26px 20px 22px;
+        color: #fff;
+        text-align: center;
+        overflow: hidden;
+        box-shadow: 0 10px 24px rgba(0,0,0,.14);
+        transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+        .table-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 32px rgba(0,0,0,.2);
+        }
+
+        .table-card::after {
+            content: "";
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.12);
+            top: -50px;
+            right: -40px;
+        }
+
+        .table-card.is-empty {
+            background: linear-gradient(135deg, #34d399, #059669);
+        }
+
+        .table-card.is-full {
+            background: linear-gradient(135deg, #f87171, #dc2626);
+        }
+
+    .table-card__delete {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.22);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+        transition: background .2s ease, transform .2s ease;
+    }
+
+        .table-card__delete:hover {
+            background: rgba(255,255,255,.4);
+            color: #fff;
+            transform: scale(1.1);
+            text-decoration: none;
+        }
+
+    .table-card__status-btn {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.22);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+        transition: background .2s ease, transform .2s ease;
+    }
+
+        .table-card__status-btn:hover {
+            background: rgba(255,255,255,.4);
+            color: #fff;
+            transform: scale(1.1) rotate(180deg);
+            text-decoration: none;
+        }
+
+    .table-card__icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 14px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.22);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .table-card__name {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .table-card__status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        border-radius: 30px;
+        background: rgba(255,255,255,.22);
+        font-size: 14px;
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+    }
+
+        .table-card__status .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #fff;
+        }
+
+    .table-card.is-full .table-card__status .dot {
+        animation: pulse 1.4s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(255,255,255,.8);
+        }
+
+        70% {
+            box-shadow: 0 0 0 8px rgba(255,255,255,0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(255,255,255,0);
+        }
+    }
+</style>
+
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+
+<script type="text/javascript">
+    var connection = new signalR.HubConnectionBuilder().withUrl("https://localhost:7003/SignalRHub").build();
+
+    connection.start().then(() => {
+        setInterval(() => {
+            connection.invoke("GetTableList");
+        }, 2000);
+    }).catch((err) => { console.log(err) });
+
+    connection.on("ReceiveEmptyTableCount", (emptyTableCount) => {
+        $("#emptyCount").text(emptyTableCount);
+        });
+    connection.on("ReceiveFullTableCount", (fullTableCount) => {
+        $("#fullCount").text(fullTableCount);
+        });
+    connection.on("ReceiveTableCount", (TableCount) => {
+        $("#tableCount").text(TableCount);
+    });
+    connection.on("ReceiveTableList", (tables) => {
+        var tablehtml = "";
+        tables.forEach((item) => {
+            var isFull = "";
+            var isFullText = "";
+            if (item.status == 1) {
+                isFull = "is-full";
+                isFullText = "Dolu";
+            }
+            else {
+                isFull = "is-empty";
+                isFullText = "Boş";
+            }
+            tablehtml += `<div class="table-card ${isFull}">
+                        <a href="/RestaurantTable/DeleteTable/${item.restaurantTableId}" class="table-card__delete" title="Masayı sil" onclick="return confirm('Bu masa silinsin mi?');"><i class="la la-trash"></i></a>
+                            <a href="/RestaurantTable/ChangeTableStatus/${item.restaurantTableId}" class="table-card__status-btn" title="Durumu değiştir" onclick="return confirm('Masanın durumu değiştirilsin mi?');"><i class="la la-exchange"></i></a>
+                        <div class="table-card__icon"><i class="la la-cutlery"></i></div>
+                        <div class="table-card__name">${item.tableName}</div>
+                        <div class="table-card__status"><span class="dot"></span>${isFullText}</div>
+                    </div>`
+        });
+        // document.getElementById("tableListBody").innerHTML = html;
+        $("#tableListBody").html(tablehtml);
+    })
+        
+</script>
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="page-title mb-0">Masalar</h4>
+            <a href="/RestaurantTable/CreateTable" class="btn btn-outline-primary">Yeni Masa Girişi</a>
+        </div>
+
+        <div class="table-summary">
+            <div class="item"><span class="dot dot-total"></span><div><div id="tableCount" class="num">@Model.Count</div><div class="label">Toplam Masa</div></div></div>
+            <div class="item"><span class="dot dot-empty"></span><div><div id="emptyCount" class="num">@emptyCount</div><div class="label">Boş</div></div></div>
+            <div class="item"><span class="dot dot-full"></span><div><div id="fullCount" class="num">@fullCount</div><div class="label">Dolu</div></div></div>
+        </div>
+
+        <div class="table-grid" id="tableListBody">
+            @foreach (var item in Model)
+            {
+                var isFull = item.Status == 1;
+                <div class="table-card @(isFull ? "is-full" : "is-empty")">
+                    <a href="/RestaurantTable/DeleteTable/@item.RestaurantTableId" class="table-card__delete" title="Masayı sil" onclick="return confirm('Bu masa silinsin mi?');"><i class="la la-trash"></i></a>
+                    <a href="/RestaurantTable/ChangeTableStatus/@item.RestaurantTableId" class="table-card__status-btn" title="Durumu değiştir" onclick="return confirm('Masanın durumu değiştirilsin mi?');"><i class="la la-exchange"></i></a>
+                    <div class="table-card__icon"><i class="la la-cutlery"></i></div>
+                    <div class="table-card__name">@item.TableName</div>
+                    <div class="table-card__status"><span class="dot"></span>@(isFull ? "Dolu" : "Boş")</div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

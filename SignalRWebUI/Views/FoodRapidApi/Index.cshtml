@@ -1,0 +1,106 @@
+@model List<ResultTastyDto>
+@{
+    Layout = "~/Views/UILayout/Index.cshtml";
+}
+
+<style>
+    .food-section { background: #f6f6f8; }
+    .food-card {
+        background: #fff; border-radius: 18px; overflow: hidden; height: 100%;
+        box-shadow: 0 6px 24px rgba(34, 40, 49, .08);
+        display: flex; flex-direction: column;
+        transition: transform .25s ease, box-shadow .25s ease;
+    }
+    .food-card:hover { transform: translateY(-6px); box-shadow: 0 14px 34px rgba(34, 40, 49, .16); }
+    .food-img { position: relative; height: 210px; background: #222831; overflow: hidden; }
+    .food-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+    .food-card:hover .food-img img { transform: scale(1.06); }
+    .food-img .no-img { height: 100%; display: flex; align-items: center; justify-content: center; color: #ffbe33; font-size: 40px; }
+    .food-time {
+        position: absolute; top: 14px; left: 14px;
+        background: rgba(34, 40, 49, .85); color: #fff; font-size: 13px; font-weight: 600;
+        padding: 6px 12px; border-radius: 30px; backdrop-filter: blur(4px);
+    }
+    .food-time i { color: #ffbe33; margin-right: 4px; }
+    .food-kcal {
+        position: absolute; right: 14px; bottom: -1px;
+        background: #ffbe33; color: #222831; font-weight: 700; font-size: 14px;
+        padding: 6px 16px; border-radius: 14px 0 0 0;
+    }
+    .food-body { padding: 20px 20px 22px; display: flex; flex-direction: column; flex: 1; }
+    .food-title {
+        font-size: 18px; font-weight: 700; color: #222831; margin-bottom: 16px; line-height: 1.35;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 48px;
+    }
+    .nutri-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+    .nutri-item { background: #f6f6f8; border-radius: 12px; text-align: center; padding: 10px 4px; }
+    .nutri-item strong { display: block; font-size: 16px; color: #222831; }
+    .nutri-item span { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: #7b8190; }
+    .food-actions { margin-top: auto; }
+    .btn-video {
+        display: block; text-align: center; background: #222831; color: #fff; font-weight: 600;
+        padding: 11px; border-radius: 30px; transition: .2s;
+    }
+    .btn-video:hover { background: #ffbe33; color: #222831; text-decoration: none; }
+    .btn-video.disabled { background: #e3e5ea; color: #9aa0ad; pointer-events: none; }
+    .food-empty { text-align: center; padding: 60px 0; color: #7b8190; }
+</style>
+
+<section class="food-section layout_padding">
+    <div class="container">
+        <div class="heading_container heading_center mb-5">
+            <h2>Rapid Api Foods</h2>
+            <p>30 dakikadan kısa sürede hazırlanan tarifler</p>
+        </div>
+
+        <div class="row">
+            @if (Model == null || !Model.Any())
+            {
+                <div class="col-12 food-empty">Gösterilecek tarif bulunamadı.</div>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    <div class="col-sm-6 col-lg-4 col-xl-3 mb-4">
+                        <div class="food-card">
+                            <div class="food-img">
+                                @if (!string.IsNullOrEmpty(item.thumbnail_url))
+                                {
+                                    <img src="@item.thumbnail_url" alt="@item.name" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <div class="no-img"><i class="fa fa-cutlery"></i></div>
+                                }
+                                <span class="food-time"><i class="fa fa-clock-o"></i> @(item.total_time_minutes > 0 ? item.total_time_minutes + " dk" : "-")</span>
+                                <span class="food-kcal">@(item.nutrition?.calories.ToString() ?? "-") kcal</span>
+                            </div>
+                            <div class="food-body">
+                                <h5 class="food-title">@item.name</h5>
+                                <div class="nutri-grid">
+                                    <div class="nutri-item"><strong>@(item.nutrition?.carbohydrates.ToString() ?? "-")</strong><span>Karbonhidrat</span></div>
+                                    <div class="nutri-item"><strong>@(item.nutrition?.fat.ToString() ?? "-")</strong><span>Yağ</span></div>
+                                    <div class="nutri-item"><strong>@(item.nutrition?.protein.ToString() ?? "-")</strong><span>Protein</span></div>
+                                    <div class="nutri-item"><strong>@(item.nutrition?.fiber.ToString() ?? "-")</strong><span>Lif</span></div>
+                                    <div class="nutri-item"><strong>@(item.nutrition?.sugar.ToString() ?? "-")</strong><span>Şeker</span></div>
+                                    <div class="nutri-item"><strong>g</strong><span>Birim</span></div>
+                                </div>
+                                <div class="food-actions">
+                                    @if (!string.IsNullOrEmpty(item.original_video_url))
+                                    {
+                                        <a href="@item.original_video_url" target="_blank" rel="noopener" class="btn-video"><i class="fa fa-play"></i> Videoyu İzle</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="btn-video disabled">Video yok</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</section>

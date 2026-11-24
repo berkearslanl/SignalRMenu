@@ -1,0 +1,16 @@
+﻿<!DOCTYPE html>
+<html>
+@await Component.InvokeAsync("AdminLayoutHead")
+<body>
+    <div class="wrapper">
+        @await Component.InvokeAsync("AdminLayoutHeader")
+        @await Component.InvokeAsync("AdminLayoutSidebar")
+        <div class="main-panel">
+            @RenderBody()
+            @await Component.InvokeAsync("AdminLayoutFooter")
+        </div>
+    </div>
+    @await Component.InvokeAsync("AdminLayoutModal")
+    @await Component.InvokeAsync("AdminLayoutScripts")
+</body>
+</html>

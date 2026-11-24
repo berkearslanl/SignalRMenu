@@ -1,0 +1,54 @@
+﻿@model CreateProductDto
+@{
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+<div class="content">
+    <div class="container-fluid">
+        <h4 class="page-title">Ürünler</h4>
+        <div class="row">
+            <div class="col-md-12">
+                <form method="post">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Ürün Ekleme Sayfası</div>
+                        </div>
+                        <div class="card-body">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label>Ürün Adı</label>
+                                <input type="text" class="form-control" asp-for="ProductName" placeholder="Ürün adını giriniz" required>
+                                <span asp-validation-for="ProductName" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Açıklama</label>
+                                <input type="text" class="form-control" asp-for="Description" placeholder="Açıklamayı giriniz" required>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Fiyat</label>
+                                <input type="text" class="form-control" asp-for="Price" placeholder="Fiyatı giriniz (örn: 220,50)" required>
+                                <span asp-validation-for="Price" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Görsel Yolu</label>
+                                <input type="text" class="form-control" asp-for="ImageUrl" placeholder="Görsel yolu giriniz" required>
+                                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Kategori</label>
+                                <select asp-for="@Model.CategoryId" asp-items="@ViewBag.Categories" class="form-control" required>
+                                    <option value="">Bir Kategori Seçiniz</option>
+                                </select>
+                                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <button type="submit" class="btn btn-success">Ekle</button>
+                        <a href="/Product/Index" class="btn btn-danger">İptal</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
